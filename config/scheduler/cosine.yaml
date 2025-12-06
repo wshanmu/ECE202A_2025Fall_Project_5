@@ -1,0 +1,5 @@
+# Cosine annealing learning rate scheduler
+
+name: "cosine"
+T_max: 100  # Maximum number of iterations (usually max_epochs)
+eta_min: 1.0e-6  # Minimum learning rate

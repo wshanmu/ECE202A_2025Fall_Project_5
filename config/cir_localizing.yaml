@@ -1,0 +1,20 @@
+# Hydra-based CIR localizing configuration values
+radios:
+  - channel: 5
+  - cir_sample: 28
+  - cir_starting_idx: 0
+  - fps: 1024
+  - duration: 10  # seconds
+  - delayTX: 6
+  - xtal_trim: 25
+  - nodes: "0123"
+  - distance_between_nodes: [522, 440, 689, 700, 483] # 01,02,03,12,13 in cm
+
+
+rooms:
+  - room: "boelter"
+  - desk_num: 1
+  - desk_layout: "1x1" # "1x1", "1x2", "2x2", "1x1T": transposed
+  - humans: 1
+  - activity: "1" # "0": empty, "1": sitting, "2": standing
+  - tag: [374,295,440,367] # to 0,1,2,3

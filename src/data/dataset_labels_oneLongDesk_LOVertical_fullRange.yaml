@@ -1,0 +1,66 @@
+# Dataset Labels for OneLongDesk Multi-Desk Radar Data
+#
+# Label format: [Desk_Left, Desk_Right]
+#   0 = empty/unoccupied
+#   1 = occupied
+#
+# Naming convention in filenames:
+#   emptyStatic/emptyMoving/emptyStanding -> [0, 0]
+#   occupyLeft -> [1, 0]
+#   occupyRight -> [0, 1]
+
+# =============================================================================
+# Horizontal Layout
+# =============================================================================
+train:
+  # Empty scenarios
+  - filename: "20251203_162539_oneLongDesk_Horizontal_loc1_emptyStatic_cir_lpf3.npy"
+    labels: [0, 0]
+  - filename: "20251203_162658_oneLongDesk_Horizontal_loc1_emptyMoving_cir_lpf3.npy"
+    labels: [0, 0]
+
+  # Occupied Left
+  - filename: "20251203_163307_oneLongDesk_Horizontal_loc1_occupyLeft_cir_lpf3.npy"
+    labels: [1, 0]
+  - filename: "20251203_165057_oneLongDesk_Horizontal_loc1_occupyLeft1_cir_lpf3.npy"
+    labels: [1, 0]
+
+  # Occupied Right
+  - filename: "20251203_163558_oneLongDesk_Horizontal_loc1_occupyRight_cir_lpf3.npy"
+    labels: [0, 1]
+  - filename: "20251203_165212_oneLongDesk_Horizontal_loc1_occupyRight1_cir_lpf3.npy"
+    labels: [0, 1]
+  # Horizontal - Validation
+  - filename: "20251203_162846_oneLongDesk_Horizontal_loc1_emptyStanding_cir_lpf3.npy"
+    labels: [0, 0]
+  - filename: "20251203_165835_oneLongDesk_Horizontal_loc1_occupyLeft2_cir_lpf3.npy"
+    labels: [1, 0]
+  - filename: "20251203_170005_oneLongDesk_Horizontal_loc1_occupyRight2_cir_lpf3.npy"
+    labels: [0, 1]
+
+
+val:
+  # Vertical - Validation
+  - filename: "20251203_174433_oneLongDesk_Vertical_loc1_emptyStanding_cir_lpf3.npy"
+    labels: [0, 0]
+  - filename: "20251203_174552_oneLongDesk_Vertical_loc1_occupyLeft_cir_lpf3.npy"
+    labels: [1, 0]
+  - filename: "20251203_175015_oneLongDesk_Vertical_loc1_occupyRight1_cir_lpf3.npy"
+    labels: [0, 1]
+  - filename: "20251203_174302_oneLongDesk_Vertical_loc1_emptyMoving_cir_lpf3.npy"
+    labels: [0, 0]
+  - filename: "20251203_174847_oneLongDesk_Vertical_loc1_occupyLeft1_cir_lpf3.npy"
+    labels: [1, 0]
+  - filename: "20251203_174723_oneLongDesk_Vertical_loc1_occupyRight_cir_lpf3.npy"
+    labels: [0, 1]
+
+
+test:
+
+  # Vertical Layout - Train
+  - filename: "20251203_174120_oneLongDesk_Vertical_loc1_emptyStatic_cir_lpf3.npy"
+    labels: [0, 0]
+  - filename: "20251203_175133_oneLongDesk_Vertical_loc1_occupyLeft2_cir_lpf3.npy"
+    labels: [1, 0]
+  - filename: "20251203_175248_oneLongDesk_Vertical_loc1_occupyRight2_cir_lpf3.npy"
+    labels: [0, 1]

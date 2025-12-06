@@ -1,0 +1,42 @@
+# Example YAML configuration for CIR Dataset
+#
+# Structure:
+# - Top-level keys: Train, Val, Test
+# - Under each split, keys are string labels ("0", "1", "2", etc.)
+# - Each label contains a list of .npy file paths
+#
+# File paths can be:
+# - Absolute paths: /absolute/path/to/file.npy
+# - Relative to this YAML file: ../data/raw/file.npy
+#
+# Each .npy file should have shape: (3, 2, X, 896)
+# where X is the number of frames (typically 4000-5000)
+
+Train:
+  "1":  # Positive class (label = 1)
+    - "data/20251103_134932_loc1_occupied_1_cir_phased.npy"
+    - "data/20251103_135037_loc1_occupied_2_cir_phased.npy"
+    - "data/20251103_135142_loc1_occupied_3_cir_phased.npy"
+    - "data/20251103_140853_loc3_occupied_2_cir_phased.npy"
+    - "data/20251103_140957_loc3_occupied_3_cir_phased.npy"
+    - "data/20251103_140747_loc3_occupied_1_cir_phased.npy"
+  "0":  # Negative class (label = 0)
+    - "data/20251103_134756_loc1_empty_cir_phased.npy"
+    - "data/20251103_135305_loc1_empty_withChair_cir_phased.npy"
+    - "data/20251103_135412_loc1_empty_withChair_2_cir_phased.npy"
+    - "data/20251103_141221_loc3_empty_withChair_2_cir_phased.npy"
+    - "data/20251103_141327_loc3_empty_withChair_3_cir_phased.npy"
+    - "data/20251103_141111_loc3_empty_withChair_1_cir_phased.npy"
+
+Val:
+  "1":
+    - "data/20251103_135953_loc2_occupied_2_cir_phased.npy"
+  "0":
+    - "data/20251103_140227_loc2_empty_withChair_1_cir_phased.npy"
+    - "data/20251103_140340_loc2_empty_withChair_2_cir_phased.npy"
+
+Test:
+  "1":
+    - "data/20251103_140107_loc2_occupied_3_cir_phased.npy"
+  "0":
+    - "data/20251103_140451_loc2_empty_withChair_3_cir_phased.npy"

@@ -1,0 +1,20 @@
+# Hydra-based CIR processing configuration values
+# Only specify input_folder - input_file will be automatically derived
+input_folder: "./tdma_sensing/cir_files/20251103_140107_loc2_occupied_3"
+discard_reading: 100
+upsample_factor: 32
+shift_amount: 1
+starting_idx: 500
+peak_wnd: 1000
+SHOW_FIG: False
+
+# CIR alignment parameters
+zero_padded_num: 0
+los_search_offset_start: 0.5  # Offset from zero_padded_num for LoS search start
+los_search_offset_end: 9    # Offset from zero_padded_num for LoS search end
+peak_win_offset_end: 4      # Offset from zero_padded_num for peak window end
+
+# Savitzky-Golay filter parameters for alignment
+savgol_window_length: 5
+savgol_polyorder: 2
+savgol_deriv: 1

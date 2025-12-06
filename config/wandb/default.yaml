@@ -1,0 +1,16 @@
+# Weights & Biases configuration
+
+# W&B project and entity
+project: "deskpulse-full-range-estimation"
+entity: null  # Your wandb username/team (null uses default)
+
+# Run organization
+group: null  # Group related runs together
+tags: []  # List of tags for this run
+
+# Logging mode
+mode: "online"  # "online", "offline", or "disabled"
+
+# Additional settings
+save_code: true  # Save main script to W&B
+notes: null  # Optional notes for this run

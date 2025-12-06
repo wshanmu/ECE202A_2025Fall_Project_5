@@ -1,0 +1,41 @@
+# Training configuration
+
+# Epochs
+max_epochs: 100
+min_epochs: 10  # Minimum epochs before early stopping can trigger
+
+# Validation
+val_interval: 1  # Validate every N epochs
+
+# Early stopping
+early_stopping_patience: 10  # Stop if no improvement for N validation epochs
+early_stopping_metric: "val/loss"  # Metric to monitor
+early_stopping_mode: "min"  # "min" or "max"
+
+# Gradient clipping
+gradient_clip_val: 1.0  # Clip gradients to this max norm (null to disable)
+
+# Checkpointing
+save_top_k: 1  # Save top K checkpoints
+save_last: true  # Also save last checkpoint
+checkpoint_metric: "val/loss"
+checkpoint_mode: "min"
+
+# Mixed precision training (optional)
+use_amp: false  # Set to true for automatic mixed precision
+
+# Profiling configuration (torch.profiler + torch-tb-profiler plugin)
+profiling:
+  enabled: false
+  log_dir: "${hydra:run.dir}/tb_profiler"
+  activities: ["CPU", "CUDA"]
+  wait_steps: 1
+  warmup_steps: 1
+  active_steps: 4
+  repeat: 1
+  skip_first: 0
+  record_shapes: true
+  profile_memory: true
+  with_stack: false
+  with_flops: false
+  with_modules: false

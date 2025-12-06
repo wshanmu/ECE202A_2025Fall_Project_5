@@ -1,0 +1,5 @@
+# StepLR scheduler configuration
+
+name: "steplr"
+step_size: 30  # Decay learning rate every N epochs
+gamma: 0.1  # Multiply LR by this factor

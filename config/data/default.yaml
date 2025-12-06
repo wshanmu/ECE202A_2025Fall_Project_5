@@ -1,0 +1,47 @@
+# Data configuration for CIR dataset
+
+# Path to dataset YAML (contains train/val/test splits and labels)
+dataset_yaml_path: "src/data/data_config.yaml"
+
+# DataLoader parameters
+batch_size: 8
+num_workers: 8
+pin_memory: true
+shuffle_train: true
+persistent_workers: true    # Keep workers alive between epochs
+prefetch_factor: 4          # Number of batches to prefetch per worker
+
+# Performance optimization
+cache_size: 10              # Number of files to cache in memory (0 to disable)
+
+# Data processing parameters
+window_size: 768  # Must be divisible by 256 for model
+stride: 768        # 50% overlap
+sender_idx: 0      # Use sender 0 (or null for all senders)
+
+# Augmentation (training only)
+augmentations_train:
+  - "gaussian_noise"
+  - "time_warp"
+
+# Complex-to-polar conversion
+complex_to_polar: true
+apply_minmax_norm: true
+
+# Range gating (optional)
+range_gated: false
+range_window_size: 64
+range_index_mapping_path: "example_range_mapping.yaml"
+
+# Range shift augmentation (only if range_gated=true)
+enable_range_shift: false
+range_shift_std: 5.0
+
+# Low-pass filter (optional)
+apply_lowpass_filter: true
+lowpass_cutoff: 3.0
+lowpass_order: 5
+lowpass_fs: 100.0
+
+# Verbose output
+verbose: true

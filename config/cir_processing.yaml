@@ -1,0 +1,38 @@
+input_folder: "./bistatic_collection/cir_files/20251203_114546_office_tag123_12s_TX0_RX13_12bit_24cir_ch9_xtalTX31_delay6_exp4"
+# input_file: "rx/cir_data_rx_newOri_notag_true24cir_ch9_xtalTX25_delay6_exp1_node1.npy"
+# input_file: "rx/cir_data_rx_newOri_true24cir_ch9_xtalTX25_delay6_exp8_node1.npy"
+# input_file: "rx/cir_data_rx_newOri_further_true24cir_ch9_xtalTX25_delay6_exp4_node1.npy"
+input_file: "rx/cir_data_rxoffice_tag123_12s_TX0_RX13_12bit_24cir_ch9_xtalTX31_delay6_exp4_node3.npy"
+discard_reading: 500
+upsample_factor: 32
+# pn_code: "./pn_code_generation_and_simulation/kasami_code/kasami_packed_10bit_dup1_4.h"
+pn_code: [
+          "./pn_code_generation_and_simulation/kasami_code/kasami_packed_12bit_dup1_0.h", 
+          "./pn_code_generation_and_simulation/kasami_code/kasami_packed_12bit_dup1_1.h",
+          "./pn_code_generation_and_simulation/kasami_code/kasami_packed_12bit_dup1_2.h",
+          "./pn_code_generation_and_simulation/kasami_code/kasami_packed_12bit_dup1_3.h",
+          "./pn_code_generation_and_simulation/kasami_code/kasami_packed_12bit_dup1_4.h"
+          ]
+# pn_code: [
+#           "./pn_code_generation_and_simulation/kasami_code/kasami_packed_10bit_dup1_0.h", 
+#           "./pn_code_generation_and_simulation/kasami_code/kasami_packed_10bit_dup1_1.h",
+#           "./pn_code_generation_and_simulation/kasami_code/kasami_packed_10bit_dup1_2.h",
+#           "./pn_code_generation_and_simulation/kasami_code/kasami_packed_10bit_dup1_3.h",
+#           "./pn_code_generation_and_simulation/kasami_code/kasami_packed_10bit_dup1_4.h"
+#           ]
+shift_amount: [0, 1]
+starting_idx: 000
+peak_wnd: 20000
+SHOW_FIG: False
+corr_indices_range: [50, 768, 1]  # [start, stop, step] for np.arange
+corr_indices_single: [215]
+
+# CIR alignment parameters
+zero_padded_num: 0
+los_search_offset_start: 0.5  # Offset from zero_padded_num for LoS search start
+los_search_offset_end: 7    # Offset from zero_padded_num for LoS search end
+peak_win_offset_end: 4      # Offset from zero_padded_num for peak window end
+
+# Savitzky-Golay filter parameters for alignment
+savgol_window_length: 5
+savgol_polyorder: 2

@@ -1,0 +1,38 @@
+# @package _global_
+
+# Quick test configuration for validating the pipeline
+# Usage: python train.py +experiment=quick_test
+
+# Override defaults
+defaults:
+  - override /optimizer: adam
+  - override /scheduler: none
+  - override /wandb: default
+
+# Experiment settings
+experiment_name: "quick_test_run"
+seed: 42
+
+# Fast training settings
+train:
+  max_epochs: 5
+  min_epochs: 2
+  val_interval: 1
+  early_stopping_patience: 3
+  gradient_clip_val: 1.0
+  use_amp: false
+  save_top_k: 1
+  save_last: true
+
+# Small batch for testing
+data:
+  batch_size: 4
+  num_workers: 2
+
+# Simple optimizer
+optimizer:
+  lr: 0.001
+
+# Disable W&B for quick testing
+wandb:
+  mode: "disabled"

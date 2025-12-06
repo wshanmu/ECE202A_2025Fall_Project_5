@@ -1,0 +1,398 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>DeskPulse</title>
+<link href="./DeskPulse_files/style.css" rel="stylesheet">
+<script type="text/javascript" src="./DeskPulse_files/jquery.mlens-1.0.min.js"></script> 
+<script type="text/javascript" src="./DeskPulse_files/jquery.js"></script>
+</head>
+
+<body>
+<div class="content">
+  <h1><strong>DeskPulse: Desk Occupancy Sensing with Commercial UWB Devices and Low Power Backscatter Tags</strong></h1>
+  <p id="authors">Shanmu Wang <br>
+    <br>
+  <span style="font-size: 24px">ECE202A Project, Fall 2025
+  </span></p>
+  <br>
+  <img src="./DeskPulse_files/system_overview.jpg" class="teaser-gif" style="width:80%;"><br>
+  <h3 style="text-align:center"><em>System overview of DeskPulse. The system uses commercial UWB radios for channel estimation, a signal-processing pipeline to calibrate hardware imperfections, and ultra-low-power backscatter tags that enable automatic desk localization by mapping each tag to specific CIR components. By feeding only desk-related CIR segments into a CNN, DeskPulse achieves generalizable desk-level occupancy estimation across different offices and layouts without per-layout retraining.</em></h3>
+    
+  <h2 style="text-align:center;">Slides and Codes</h2>
+  <font size="+1">
+          <p style="text-align: center;">
+            <a href="./DeskPulse_files/202Midterm.pdf" target="_blank">[Midterm Checkpoint]</a> &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href="./DeskPulse_files/202Final.pdf" target="_blank">[Final Slides]</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="https://github.com/wshanmu/ECM202A_2025Fall_Project_5" target="_blank">[Code]</a> 
+          </p>
+    </font>
+</div>
+<div class="content">
+  <h2 style="text-align:center;">Abstract</h2>
+  <p>
+Hot-desk offices need <em>desk-level</em> occupancy sensing for applications such as wake-on-use networking and space analytics, but existing approaches do not scale across layouts. Camera-based systems raise privacy concerns, while device-free RF methods (Wi-Fi, UWB, or radar) learn from full-channel fingerprints that must be recollected whenever desks or access points move.
+We present <em>DeskPulse</em>, a UWB sensing system that makes desk occupancy <em>geometry-aware</em> by attaching an ultra-low-power backscatter tag to each desk and localizing these tags with commercial UWB radios on next-generation Wi-Fi access points. By mapping each tag to specific regions of the channel impulse response (CIR), DeskPulse tells the model <em>which part of the CIR belongs to which desk</em>. This avoids per-layout fingerprinting: when the room layout or AP placement changes, DeskPulse only re-localizes the tags instead of re-collecting labeled occupancy data.
+To make this practical, DeskPulse introduces (i) a signal-processing pipeline that compensates hardware imperfections in COTS UWB radios through FFT upsampling, two-stage amplitude alignment, and LoS-based phase correction for reliable CIR estimates, (ii) a batteryless backscatter tag (56 mm × 27 mm) that embeds Kasami pseudo-noise codes for high processing gain and CDMA-like multi-desk scaling, and (iii) a 2D ResNet model with physics-aware data augmentations that learns generalizable occupancy features from range-gated CIR segments.
+We evaluate DeskPulse on a 5-desk testbed across two rooms with different layouts. It localizes desks within <em>10 cm</em> and achieves <em>79.17% occupancy accuracy on unseen layouts</em> (versus 66.67% for full-range baseline), <em>without manual calibration or per-layout fingerprinting</em>.
+</p>
+</div>
+<div class="content">
+<h2>Background</h2>
+
+<h3><em>What is Ultra-Wideband (UWB)?</em></h3> 
+<p>
+  Ultra-wideband (UWB) is a radio technology that transmits short pulses across a wide frequency spectrum (e.g., 500 MHz bandwidth at 7.9 GHz), enabling precise temporal resolution of signal arrivals. Unlike narrowband Wi-Fi systems that struggle to distinguish nearby desks, UWB's wide bandwidth provides fine spatial resolution—capable of separating multipath components just centimeters apart. This makes UWB particularly suitable for desk-level occupancy sensing: by isolating the specific multipath reflections from each desk in the channel impulse response, the system can monitor individual desks independently of the broader room geometry. UWB radios are increasingly integrated into next-generation wireless access points (e.g., Cisco), positioning them as a scalable infrastructure for workspace sensing.
+</p>
+
+<h3><em>What is Channel Impulse Response (CIR)?</em></h3> 
+<p>
+  The Channel Impulse Response (CIR) characterizes how a transmitted signal propagates through space, capturing all multipath components (e.g., direct line-of-sight, reflections from walls, furniture, and people) as a function of time (or equivalently, distance). Each peak in the CIR corresponds to a signal path at a specific range. In DeskPulse, the CIR reveals which parts of the environment reflect UWB signals; by mapping specific CIR regions to individual desks, the system can focus occupancy detection on relevant signal components rather than learning entire-room fingerprints.
+</p>
+
+<h3><em>What is Backscatter Communication?</em></h3> 
+<p>
+  Backscatter communication [7,8] allows a device to transmit information by modulating the reflection of an incident radio signal, rather than generating its own transmission. A backscatter tag uses a simple RF switch to toggle between reflective states (e.g., short vs. open circuit), creating a 180° phase shift in the reflected signal. This requires minimal power (no active radio transmitter), making it ideal for batteryless, maintenance-free deployment. In DeskPulse, each tag modulates its reflection with a unique pseudo-noise code, enabling the system to identify and localize individual desks.
+</p>
+
+<h3><em>What are Pseudo-Noise (PN) Codes?</em></h3> 
+<p>
+  Pseudo-Noise (PN) sequences, such as Kasami codes, are deterministic binary patterns with strong auto-correlation (easy to detect) and weak cross-correlation (minimal interference between codes). By embedding different PN codes in each tag's backscatter reflection, DeskPulse can distinguish multiple tags simultaneously and locate each desk by correlating the CIR with known code patterns. This provides both processing gain to detect weak reflections and scalability to monitor many desks in parallel.
+</p>
+</div>
+
+<div class="content">
+<h2>Related Work</h2>
+
+<h3>UWB-Based Human Detection and Occupancy Sensing</h3>
+  <p>
+    Ultra-wideband (UWB) radio has been widely adopted for human detection and occupancy sensing due to its high temporal resolution, obstacle penetration capability, and privacy-preserving nature compared to camera-based systems.
+    Early work by Kim et al. [1] developed robust detection methods for determining the presence of individuals in indoor environments using IR-UWB radar, addressing challenges such as heavy clutter and multipath effects through systematic clutter reduction techniques including SVD-based approaches and two-stage detection schemes.
+    Their work demonstrated that combining range-domain and frequency-domain detection (for respiratory movement) could successfully identify both standing and lying individuals even in challenging environments.
+  </p>
+
+  <p>
+    More recently, Blangiardi et al. [2] explored AI-based people counting in public transport vehicles using multiple IR-UWB transceivers, showing that data fusion from multiple sensors combined with machine learning models could achieve up to 100% accuracy when trained on exhaustive datasets.
+    Their work highlighted the importance of training data diversity and demonstrated that models could generalize to unseen static configurations with up to 91.5% accuracy in simpler scenarios.
+    However, both approaches rely on full-channel fingerprints that require extensive data collection for each new environment or layout configuration.
+  </p>
+
+  <h3>Limitations of Fingerprinting-Based Approaches</h3>
+  <p>
+    While these UWB sensing systems demonstrate strong performance, they share a fundamental limitation: they learn from entire Channel Impulse Response (CIR) patterns that are highly specific to a particular room geometry and furniture arrangement.
+    Kim et al.'s [1] SVD-based clutter reduction assumes stationary background clutter captured in initial calibration measurements, while Blangiardi et al. [2] found that models trained on one positional configuration of people performed significantly worse (accuracy dropping from 91.5% to as low as 34.1%) when tested on different layouts.
+    This fingerprinting dependency means that whenever desks, access points, or room layouts change, these systems require complete recalibration and retraining—a costly and unscalable process for dynamic workspace environments.
+  </p>
+</div>
+
+
+<div class="content">
+  <h2>Approach</h2>
+  <h3>Signal Processing Pipeline: Hardware imperfections calibration</h3>
+  <p>
+    The first challenge is obtaining reliable CIR estimates from commercial UWB radios despite hardware imperfections.
+    COTS UWB systems use bi-static configurations, where transmitter and receiver are separate devices with independent oscillators. 
+    This introduces frame misalignment and carrier frequency offset (CFO), causing significant variations in both amplitude and phase of the CIR across frames.
+    Without correction, these imperfections introduce noise that degrades both tag localization and occupancy detection.
+    We address this through a signal processing pipeline that calibrates CIR estimates for consistent, high-fidelity measurements.
+
+  </p>
+  <br>
+    <img class="summary-img" src="./DeskPulse_files/deskpulse_signal_processing.png" style="width:80%;">
+  </br>
+  <p>
+    <em>CIR Upsampling:</em>
+    COTS UWB radios (e.g., Qorvo DW3000 [9]) provide CIR estimates with ~1 ns sampling intervals, corresponding to ~30 cm spatial resolution.
+    Desk-level sensing requires finer resolution to distinguish nearby reflections, so we apply FFT-based upsampling through zero-padding in the frequency domain, increasing the temporal resolution for precise multipath separation.
+  </p>
+
+  <p>
+    <em>Amplitude Normalization & Two-Stage Frame Alignment:</em>
+    UWB radios construct CIR estimates by accumulating preamble symbols, so we first normalize amplitudes based on the reported accumulation count to ensure consistency across frames.
+    For alignment, prior works rely on the first-path index reported by the radio's leading-edge detection algorithm, but this proves unreliable in practice.
+    Instead, we exploit the fact that access points are typically ceiling- or wall-mounted, ensuring a stable line-of-sight (LoS) path between transmitter and receiver.
+    We perform cross-correlation on the LoS region to align each frame to a reference, similar to previous work [3], but we find that raw amplitude correlation can fail to align frames when peaks merge or amplitudes vary.
+    To improve robustness, we apply a second-stage alignment by correlating the second derivative of the amplitude profile, which is more sensitive to peak structure and successfully handles merged peaks [4].
+
+  </p>
+  <br>
+    <img class="summary-img" src="./DeskPulse_files/frame_alignment.png" style="width:100%;">
+  </br>
+  <!-- <p>
+    Frame interpolation:
+  </p> -->
+
+  <p>
+    <em>Phase Alignment (CFO Compensation):</em> 
+      CFO arises from oscillator mismatch between transmitter and receiver, causing phase rotation that accumulates across all multipath components.
+      Since the LoS path phase should remain constant in our bi-static setup with fixed AP locations, we use a "follow the leader" approach: estimate the phase rotation of the LoS path relative to a reference frame, then compensate for this rotation across the entire CIR.
+      This single correction removes CFO-induced phase distortion from all components simultaneously.
+  </p>
+
+  <p>
+    <em>Static Clutter Removal:</em>
+    Finally, we remove static reflections from walls and furniture by subtracting a temporal average CIR, highlighting the dynamic changes caused by human presence while suppressing unchanging environmental clutter.
+  </p>
+
+
+  <h3>Low Power Backscatter Tags: Mapping CIR components with desks at scale</h3>
+  <p>
+    Once the CIR estimates are calibrated, the next challenge is achieving desk-level occupancy sensing that generalizes across room layouts without extensive per-layout fingerprinting.
+    When desks or access points move in a new office configuration, the full CIR changes dramatically, invalidating previously collected training data.
+    Traditional device-free sensing approaches must then re-collect labeled occupancy samples for each new layout, which is a costly and unscalable process.
+  </p>
+
+  <p>
+    DeskPulse solves this by making occupancy detection <em>geometry-aware</em>: instead of learning from the entire CIR, we focus only on the CIR components corresponding to each desk.
+    We attach an ultra-low-power backscatter tag to each desk that reflects UWB signals modulated with a unique pseudo-noise (PN) sequence.
+    By localizing these tags, we map each desk to specific ranges in the CIR.
+    When the layout changes, DeskPulse only re-localizes the tags (a quick, automated process) instead of re-collecting labeled occupancy data.
+  </p>
+
+  <p>
+    Backscatter tags are essential for three reasons: (1) they operate without batteries, making them maintenance-free for long-term deployment, (2) the PN sequence provides processing gain that enables reliable detection despite UWB's strict power limits, and (3) using orthogonal PN codes (Kasami sequences) enables CDMA-like multi-tag operation, allowing many desks to be localized simultaneously without interference.
+  </p>
+
+  <br>
+  <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+    <div style="text-align: center; width: 47.5%;">
+      <img src="./DeskPulse_files/PCB_block.drawio.png" style="width:100%;">
+      <p style="text-align: center; margin-top: 5px;">Block diagram for the tag</p>
+    </div>
+    <div style="text-align: center; width: 47.5%;">
+      <img src="./DeskPulse_files/tag_annotated.jpg" style="width:100%;">
+      <p style="text-align: center;margin-top: 5px;">Fabricated tag</p>
+    </div>
+  </div>
+  <br>
+
+  <p>
+    Each tag (56 mm x 27 mm) consists of a UWB antenna, an SP2T RF switch, a real-time clock (RTC) module, and a microcontroller (MCU).
+    The MCU stores a unique Kasami PN sequence and generates a control signal that drives the RF switch to toggle between short and open circuit states at the clock rate.
+    These two states re-radiate the incoming UWB signal with a 180° phase difference, embedding the PN code in the backscattered reflection.
+    When a UWB AP transmits, the tag modulates its reflection with this code, creating a distinct pattern in the received CIR.
+    By correlating specific CIR time bins with known PN sequences, DeskPulse identifies which part of the CIR corresponds to which tag, and therefore which desk. This enables automatic desk-to-CIR mapping at scale.
+  </p>
+
+
+  <h3>Challenge 3: Generalizable Occupancy Detection with Range-Gated Learning</h3>
+  <br>
+  <img class="summary-img" src="./DeskPulse_files/deskpulse_model.png" style="width:100%;">
+  </br>
+
+  <p> 
+    After localizing tags and mapping them to specific CIR ranges, DeskPulse performs <em>range-gating</em>: extracting only the CIR segments corresponding to each desk and feeding them to a convolutional neural network.
+    This geometry-aware approach focuses the model on desk-relevant reflections while filtering out unrelated environmental clutter, enabling generalization across different room and desk layouts without retraining.
+  </p>
+
+  <p>
+    Following a similar design in [5], our occupancy detection pipeline begins with a <em>2D ResNet block</em> that extracts features across both spatial (CIR time bins) and temporal (consecutive frames) dimensions, capturing how reflections evolve as people move and occupy desks.
+    An average pooling layer then aggregates spatial features, followed by a <em>1D ResNet block</em> that further refines temporal patterns.
+    Finally, a pooling layer and fully connected layer output the binary occupancy status for each desk.
+    To improve robustness against "ghost occupancy" caused by multipath reflections from people in adjacent areas, DeskPulse uses multiple receiver nodes to increase observation diversity and reduce false positives.
+  </p>
+
+  <p>
+    To enhance generalization, we apply physics-aware data augmentations that simulate realistic CIR variations:
+    (1) <em>Gaussian noise</em> to model measurement uncertainty,
+    (2) <em>random range center shifts</em> to account for small localization errors during range-gating, and
+    (3) <em>time warping</em> to simulate varying speeds of human movement.
+    These augmentations encourage the model to learn robust features that remain invariant to environmental perturbations, improving cross-layout performance without requiring extensive real-world data collection.
+  </p>
+</div>
+<div class="content">
+  <h2>Results</h2>
+  <p> We evaluate DeskPulse on two key questions:</p>
+  <ul>
+    <li>How accurately can DeskPulse localize desks using backscatter tags?</li>
+    <li>How well does the occupancy model generalize to unseen desk layouts?</li>
+  </ul>
+  <h3>Experimental Setup</h3>
+  <p>
+    We deploy DeskPulse in a common office environment with five desks, each equipped with a backscatter tag encoded with a unique 12-bit Kasami code (length 4095).
+    Qorvo DWM3001CDK [9] UWB nodes serve as access points at fixed locations (Channel 9, 7.9 GHz center frequency, 500 MHz bandwidth).
+    We heavily modified the firmware to extract raw CIR estimates at 1024 Hz, with each PN symbol lasting 2 CIR frames (512 Hz symbol rate).
+    For tag localization, one node transmits while all other nodes receive and record CIR estimates.
+  </p>
+
+  <h3>Tag Localization Performance</h3>
+  <br>
+  <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+    <div style="text-align: center; width: 35%;">
+      <img src="./DeskPulse_files/multi_node_setup.png" style="width:100%;">
+      <p style="text-align: center; margin-top: 5px;">Tag Deployment Setup</p>
+    </div>
+    <div style="text-align: center; width: 60%;">
+      <img src="./DeskPulse_files/cir_data_rxtag01234_Node1_12it_24cir_ch9_xtalTX31_delay6_exp1_node1.npy_fivetag_normalized_pmr.png" style="width:100%;">
+      <p style="text-align: center;margin-top: 5px;">Correlation Results</p>
+    </div>
+  </div>
+  <br>
+  <p>
+    The correlation results clearly reveal distinct peaks for all five tags, enabling simultaneous excess path length estimation for each desk.
+    Multiple peaks appear for each tag due to multipath reflections from walls and furniture.
+    To extract the direct path, we apply a derivative-based peak selection algorithm: (1) normalize correlation power across CIR time bins to account for varying signal strengths at different tag distances, (2) compute the derivative of the normalized correlation to accurately identify peak locations, and (3) select the earliest peak exceeding a normalized amplitude threshold of 0.3 as the direct path measurement.
+  </p>
+  <p>
+    DeskPulse achieves <strong>localization errors below 10 cm</strong> across all five tags simultaneously.
+    This precision is sufficient for reliable desk-to-CIR mapping, and the use of orthogonal Kasami codes enables interference-free multi-tag operation, demonstrating scalability to many-desk deployments.
+  </p>
+
+  <h3>Generalization to Unseen Layouts</h3>
+  <br>
+  <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+    <div style="text-align: center; width: 30%;">
+      <img src="./DeskPulse_files/node_deployment.png" style="width:100%;">
+      <p style="text-align: center; margin-top: 5px;">UWB Node Deployment Setup Illustration</p>
+    </div>
+    <div style="text-align: center; width: 65%;">
+      <img src="./DeskPulse_files/desk_layout.png" style="width:100%;">
+      <p style="text-align: center;margin-top: 5px;">Desk Layouts</p>
+    </div>
+  </div>
+  <br>
+
+  <p>
+    To evaluate cross-layout generalization, we setup the system to have four UWB nodes positioned at the corners of the room (inter-node distances ranging from 4.64 m to 7.38 m) to increase observation diversity and mitigate multipath-induced false positives.
+    We test two desk configurations: <em>Layout 1</em> arranges a two-seat desk horizontally, while <em>Layout 2</em> arranges it vertically, creating substantially different multipath environments.
+  </p>
+
+  <p>
+    For each layout, we collect 3 minutes of data per condition: Desk 1 occupied, Desk 2 occupied, and both desks empty (with people walking or standing nearby to simulate realistic clutter).
+    The four nodes operate in Time Division Multiple Access (TDMA) mode at 400 Hz total system rate, yielding 100 Hz effective sampling per node.
+    This multi-node, multi-layout dataset captures diverse spatial perspectives and human activity patterns.
+  </p>
+
+  <p>
+    We train the occupancy model on Layout 1 and test on the unseen Layout 2 to evaluate  generalization capability.
+    DeskPulse (with range-gating) is compared against a baseline that uses the full CIR without geometry-aware filtering.
+    Both models are trained using the Adam optimizer for 100 epochs (learning rate 0.001, batch size 32).
+  </p>
+
+  <p>
+    <strong>Results:</strong> DeskPulse achieves <strong>79.17% test accuracy</strong> on the unseen layout, significantly outperforming the full-CIR baseline at <strong>66.67%</strong>.
+    Notably, the baseline overfits to Layout 1 (97.66% training accuracy vs. DeskPulse's 86.11%), while DeskPulse's range-gating and physics-aware augmentations prevent overfitting and enable better generalization.
+    This demonstrates that focusing on desk-specific CIR segments rather than entire-room fingerprints is helpful for cross-layout robustness without per-layout retraining.
+  </p>
+
+</div>
+<div class="content">
+  <h2>Discussion</h2>
+  <h3>Tag Cost & Power Consumption</h3>
+  <p>
+    The backscatter tag's key components, costs, and power consumption are summarized in Table 1.
+    At bulk pricing (1,000 units), component cost totals approximately <strong>$3.99 per tag</strong>.
+    PCB fabrication uses standard FR-4 substrate, adding minimal cost for this simple, compact design (56 mm x 27 mm).
+    The RF switch dominates power consumption at 49.5 μW quiescent power, while the RTC and MCU contribute negligibly.
+    With sub-50 μW operation, tags can be powered by small coin-cell batteries (years of maintenance-free operation) or energy harvesting (e.g., indoor solar panels), making them practical for long-term office deployments.
+  </p>
+    <table class="research-table">
+      <caption>Table 1: Unit cost (USD) and power for tag components. Costs shown at single-unit and 1,000-unit volumes.</caption>
+      
+      <thead>
+        <tr>
+          <th rowspan="2" class="text-left">Part</th>                
+                <th colspan="2" class="text-center cmidrule">Cost [$]</th>
+                
+                <th colspan="3" class="text-center cmidrule">Quiescent Power</th>
+            </tr>
+            
+            <tr>
+                <th class="text-right">@1</th>
+                <th class="text-right">@1000</th>
+                
+                <th class="text-right">Current [μA]</th>
+                <th class="text-right">Volt. [V]</th>
+                <th class="text-right">Power [μW]</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td class="text-left">Taoglas UWC.20 Antenna [10]</td>
+                <td class="text-right">3.89</td>
+                <td class="text-right">1.94</td>
+                <td colspan="3" class="text-center" style="font-style: italic;">
+                    Passive (no quiescent power)
+                </td>
+            </tr>
+            
+            <tr>
+                <td class="text-left">SKY59608-711LF Switch [11]</td>
+                <td class="text-right">0.68</td>
+                <td class="text-right">0.32</td>
+                <td class="text-right">15.00</td>
+                <td class="text-right">3.3</td>
+                <td class="text-right">49.50</td>
+            </tr>
+            
+            <tr>
+                <td class="text-left">RTC RV-3032-C7 Clock [12]</td>
+                <td class="text-right">3.18</td>
+                <td class="text-right">1.73</td>
+                <td class="text-right">0.16</td>
+                <td class="text-right">3.0</td>
+                <td class="text-right">0.48</td>
+            </tr>
+        </tbody>
+    </table>
+  <h3>Limitations</h3>
+  <p>
+    <em>Limited Dataset Diversity:</em>
+    Our current dataset is limited in size and scenarios, restricting the model's performance on edge cases such as people standing near desks without sitting or moving dynamically in close proximity.
+    Collecting large-scale labeled occupancy data in real offices is time-intensive and logistically challenging, particularly for capturing diverse human behaviors and environmental conditions.
+  </p>
+
+  <p>
+    <em>Low-Height AP Placement:</em>
+    The current prototype uses tripod stands (1.6-1.8 m height) to mount UWB nodes, making them vulnerable to line-of-sight blockage when people walk between APs.
+    This affects both the amplitude alignment pipeline (which relies on stable LoS) and overall sensing quality.
+    In real deployments, APs would be ceiling- or high-wall-mounted (2.5-3 m+), significantly reducing LoS occlusion and improving robustness.
+  </p>
+
+  <h3>Future Work</h3>
+  <p>
+    Several directions can extend DeskPulse's capabilities and practicality:
+  </p>
+  <ul>
+    <li>
+      <strong>Ceiling-Height Deployment:</strong> 
+      Move UWB nodes to realistic mounting heights (2.5+ m) to better simulate production environments and eliminate LoS blockage issues observed in the current setup.
+    </li>
+    <li>
+      <strong>Large-Scale Data Collection:</strong> 
+      Gather datasets across diverse office environments, desk configurations, and furniture arrangements to improve model generalizability and capture real-world variability in human behavior and spatial layouts.
+    </li>
+    <li>
+      <strong>Radar-Based Exploration:</strong> 
+      Investigate the same geometry-aware approach using UWB radar kits (e.g., Qorvo Qm35825DK [13]), which may provide more stable CIR measurements and simplify hardware integration with existing building infrastructure.
+    </li>
+    <li>
+      <strong>Advanced Learning Techniques:</strong> 
+      Incorporate domain adaptation and self-supervised learning to enable the model to adapt to new environments with minimal or no labeled data, further reducing deployment overhead.
+    </li>
+  </ul>
+</div>
+
+<div class="content">
+  <h2>Reference</h2>
+    [1] Robust Detection of Presence of Individuals in an Indoor Environment Using IR-UWB Radar <br>
+    [2] Exploring Data Fusion for AI-based People  Counting in a Static Public Transport Vehicle using  Multiple IR-UWB Transceivers <br>
+    [3] Respiro: Continuous Respiratory Rate Monitoring During Motion via Wearable Ultra-Wideband Radar <br>
+    [4] UTrack3D: 3D Tracking Using Ultra-wideband (UWB) Radios <br>
+    [5] UWB Radar-based Heart Rate Monitoring: A Transfer Learning Approach <br>
+    [7] Ultra-wide bandwidth backscatter modulation: processing schemes and performance <br>
+    [8] Passive UWB RFID for Tag Localization: Architectures and Design <br>
+    [9] Qorvo DWM3000 <a href="https://www.qorvo.com/products/p/DWM3000">https://www.qorvo.com/products/p/DWM3000</a> <br>
+    [10] Taoglas UWC.20 <a href="https://www.taoglas.com/product/uwc-20-3-5ghz-6-9ghz-ultra-wideband-uwb-smd-chip-antenna/">https://www.taoglas.com/product/uwc-20-3-5ghz-6-9ghz-ultra-wideband-uwb-smd-chip-antenna/</a> <br>
+    [11] SKY59608-711LF <a href="https://www.skyworksinc.com/en/Products/switches/SKY59608-711LF">https://www.skyworksinc.com/en/Products/switches/SKY59608-711LF</a> <br>
+    [12] RV-3032-C7 <a href="https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3032-c7">https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3032-c7</a> <br>
+    [13] Qorvo QM35825DK <a href="https://www.qorvo.com/products/p/QM35825DK-05">https://www.qorvo.com/products/p/QM35825DK-05</a> <br>
+</div>
+
+
+<div class="content" id="acknowledgements">
+    Project page template is borrowed from <a href="https://animatediff.github.io/">AnimateDiff</a>
+  </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Main configuration file for SpatioTemporal ResNet training
+# This file composes all sub-configs using Hydra
+
+defaults:
+  - data: default
+  - train: default
+  - optimizer: adam
+  - scheduler: cosine
+  - wandb: default
+  - _self_
+
+# Experiment metadata
+seed: 42
+experiment_name: "spatiotemporal_resnet_hr"
+output_dir: "outputs"  # Hydra will create timestamped subdirs
+
+# Model architecture (fixed for SpatioTemporalResNetHR)
+model:
+  name: "SpatioTemporalResNetHR"
+  # No additional params needed - architecture is fixed
+
+# Device configuration
+device: "cuda"  # or "cpu"
