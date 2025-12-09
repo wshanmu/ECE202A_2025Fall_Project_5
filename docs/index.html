@@ -1,28 +1,28 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>DeskPulse</title>
-<link href="./DeskPulse_files/style.css" rel="stylesheet">
-<script type="text/javascript" src="./DeskPulse_files/jquery.mlens-1.0.min.js"></script> 
-<script type="text/javascript" src="./DeskPulse_files/jquery.js"></script>
+<title>DeskSense</title>
+<link href="./DeskSense_files/style.css" rel="stylesheet">
+<script type="text/javascript" src="./DeskSense_files/jquery.mlens-1.0.min.js"></script> 
+<script type="text/javascript" src="./DeskSense_files/jquery.js"></script>
 </head>
 
 <body>
 <div class="content">
-  <h1><strong>DeskPulse: Desk Occupancy Sensing with Commercial UWB Devices and Low Power Backscatter Tags</strong></h1>
+  <h1><strong>DeskSense: Desk Occupancy Sensing with Commercial UWB Devices and Low Power Backscatter Tags</strong></h1>
   <p id="authors">Shanmu Wang <br>
     <br>
   <span style="font-size: 24px">ECE202A Project, Fall 2025
   </span></p>
   <br>
-  <img src="./DeskPulse_files/system_overview.jpg" class="teaser-gif" style="width:80%;"><br>
-  <h3 style="text-align:center"><em>System overview of DeskPulse. The system uses commercial UWB radios for channel estimation, a signal-processing pipeline to calibrate hardware imperfections, and ultra-low-power backscatter tags that enable automatic desk localization by mapping each tag to specific CIR components. By feeding only desk-related CIR segments into a CNN, DeskPulse achieves generalizable desk-level occupancy estimation across different offices and layouts without per-layout retraining.</em></h3>
+  <img src="./DeskSense_files/system_overview.jpg" class="teaser-gif" style="width:80%;"><br>
+  <h3 style="text-align:center"><em>System overview of DeskSense. The system uses commercial UWB radios for channel estimation, a signal-processing pipeline to calibrate hardware imperfections, and ultra-low-power backscatter tags that enable automatic desk localization by mapping each tag to specific CIR components. By feeding only desk-related CIR segments into a CNN, DeskSense achieves generalizable desk-level occupancy estimation across different offices and layouts without per-layout retraining.</em></h3>
     
   <h2 style="text-align:center;">Slides and Codes</h2>
   <font size="+1">
           <p style="text-align: center;">
-            <a href="./DeskPulse_files/202Midterm.pdf" target="_blank">[Midterm Checkpoint]</a> &nbsp;&nbsp;&nbsp;&nbsp;
-	          <a href="./DeskPulse_files/202Final.pdf" target="_blank">[Final Slides]</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="./DeskSense_files/202Midterm.pdf" target="_blank">[Midterm Checkpoint]</a> &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href="./DeskSense_files/202Final.pdf" target="_blank">[Final Slides]</a> &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="https://github.com/wshanmu/ECM202A_2025Fall_Project_5" target="_blank">[Code]</a> 
           </p>
     </font>
@@ -31,9 +31,9 @@
   <h2 style="text-align:center;">Abstract</h2>
   <p>
 Hot-desk offices need <em>desk-level</em> occupancy sensing for applications such as wake-on-use networking and space analytics, but existing approaches do not scale across layouts. Camera-based systems raise privacy concerns, while device-free RF methods (Wi-Fi, UWB, or radar) learn from full-channel fingerprints that must be recollected whenever desks or access points move.
-We present <em>DeskPulse</em>, a UWB sensing system that makes desk occupancy <em>geometry-aware</em> by attaching an ultra-low-power backscatter tag to each desk and localizing these tags with commercial UWB radios on next-generation Wi-Fi access points. By mapping each tag to specific regions of the channel impulse response (CIR), DeskPulse tells the model <em>which part of the CIR belongs to which desk</em>. This avoids per-layout fingerprinting: when the room layout or AP placement changes, DeskPulse only re-localizes the tags instead of re-collecting labeled occupancy data.
-To make this practical, DeskPulse introduces (i) a signal-processing pipeline that compensates hardware imperfections in COTS UWB radios through FFT upsampling, two-stage amplitude alignment, and LoS-based phase correction for reliable CIR estimates, (ii) a batteryless backscatter tag (56 mm × 27 mm) that embeds Kasami pseudo-noise codes for high processing gain and CDMA-like multi-desk scaling, and (iii) a 2D ResNet model with physics-aware data augmentations that learns generalizable occupancy features from range-gated CIR segments.
-We evaluate DeskPulse on a 5-desk testbed across two rooms with different layouts. It localizes desks within <em>10 cm</em> and achieves <em>79.17% occupancy accuracy on unseen layouts</em> (versus 66.67% for full-range baseline), <em>without manual calibration or per-layout fingerprinting</em>.
+We present <em>DeskSense</em>, a UWB sensing system that makes desk occupancy <em>geometry-aware</em> by attaching an ultra-low-power backscatter tag to each desk and localizing these tags with commercial UWB radios on next-generation Wi-Fi access points. By mapping each tag to specific regions of the channel impulse response (CIR), DeskSense tells the model <em>which part of the CIR belongs to which desk</em>. This avoids per-layout fingerprinting: when the room layout or AP placement changes, DeskSense only re-localizes the tags instead of re-collecting labeled occupancy data.
+To make this practical, DeskSense introduces (i) a signal-processing pipeline that compensates hardware imperfections in COTS UWB radios through FFT upsampling, two-stage amplitude alignment, and LoS-based phase correction for reliable CIR estimates, (ii) a batteryless backscatter tag (56 mm × 27 mm) that embeds Kasami pseudo-noise codes for high processing gain and CDMA-like multi-desk scaling, and (iii) a 2D ResNet model with physics-aware data augmentations that learns generalizable occupancy features from range-gated CIR segments.
+We evaluate DeskSense on a 5-desk testbed across two rooms with different layouts. It localizes desks within <em>10 cm</em> and achieves <em>79.17% occupancy accuracy on unseen layouts</em> (versus 66.67% for full-range baseline), <em>without manual calibration or per-layout fingerprinting</em>.
 </p>
 </div>
 <div class="content">
@@ -46,17 +46,17 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
 
 <h3><em>What is Channel Impulse Response (CIR)?</em></h3> 
 <p>
-  The Channel Impulse Response (CIR) characterizes how a transmitted signal propagates through space, capturing all multipath components (e.g., direct line-of-sight, reflections from walls, furniture, and people) as a function of time (or equivalently, distance). Each peak in the CIR corresponds to a signal path at a specific range. In DeskPulse, the CIR reveals which parts of the environment reflect UWB signals; by mapping specific CIR regions to individual desks, the system can focus occupancy detection on relevant signal components rather than learning entire-room fingerprints.
+  The Channel Impulse Response (CIR) characterizes how a transmitted signal propagates through space, capturing all multipath components (e.g., direct line-of-sight, reflections from walls, furniture, and people) as a function of time (or equivalently, distance). Each peak in the CIR corresponds to a signal path at a specific range. In DeskSense, the CIR reveals which parts of the environment reflect UWB signals; by mapping specific CIR regions to individual desks, the system can focus occupancy detection on relevant signal components rather than learning entire-room fingerprints.
 </p>
 
 <h3><em>What is Backscatter Communication?</em></h3> 
 <p>
-  Backscatter communication [7,8] allows a device to transmit information by modulating the reflection of an incident radio signal, rather than generating its own transmission. A backscatter tag uses a simple RF switch to toggle between reflective states (e.g., short vs. open circuit), creating a 180° phase shift in the reflected signal. This requires minimal power (no active radio transmitter), making it ideal for batteryless, maintenance-free deployment. In DeskPulse, each tag modulates its reflection with a unique pseudo-noise code, enabling the system to identify and localize individual desks.
+  Backscatter communication [7,8] allows a device to transmit information by modulating the reflection of an incident radio signal, rather than generating its own transmission. A backscatter tag uses a simple RF switch to toggle between reflective states (e.g., short vs. open circuit), creating a 180° phase shift in the reflected signal. This requires minimal power (no active radio transmitter), making it ideal for batteryless, maintenance-free deployment. In DeskSense, each tag modulates its reflection with a unique pseudo-noise code, enabling the system to identify and localize individual desks.
 </p>
 
 <h3><em>What are Pseudo-Noise (PN) Codes?</em></h3> 
 <p>
-  Pseudo-Noise (PN) sequences, such as Kasami codes, are deterministic binary patterns with strong auto-correlation (easy to detect) and weak cross-correlation (minimal interference between codes). By embedding different PN codes in each tag's backscatter reflection, DeskPulse can distinguish multiple tags simultaneously and locate each desk by correlating the CIR with known code patterns. This provides both processing gain to detect weak reflections and scalability to monitor many desks in parallel.
+  Pseudo-Noise (PN) sequences, such as Kasami codes, are deterministic binary patterns with strong auto-correlation (easy to detect) and weak cross-correlation (minimal interference between codes). By embedding different PN codes in each tag's backscatter reflection, DeskSense can distinguish multiple tags simultaneously and locate each desk by correlating the CIR with known code patterns. This provides both processing gain to detect weak reflections and scalability to monitor many desks in parallel.
 </p>
 </div>
 
@@ -97,7 +97,7 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
 
   </p>
   <br>
-    <img class="summary-img" src="./DeskPulse_files/deskpulse_signal_processing.png" style="width:80%;">
+    <img class="summary-img" src="./DeskSense_files/DeskSense_signal_processing.png" style="width:80%;">
   </br>
   <p>
     <em>CIR Upsampling:</em>
@@ -115,7 +115,7 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
 
   </p>
   <br>
-    <img class="summary-img" src="./DeskPulse_files/frame_alignment.png" style="width:100%;">
+    <img class="summary-img" src="./DeskSense_files/frame_alignment.png" style="width:100%;">
   </br>
   <!-- <p>
     Frame interpolation:
@@ -142,10 +142,10 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
   </p>
 
   <p>
-    DeskPulse solves this by making occupancy detection <em>geometry-aware</em>: instead of learning from the entire CIR, we focus only on the CIR components corresponding to each desk.
+    DeskSense solves this by making occupancy detection <em>geometry-aware</em>: instead of learning from the entire CIR, we focus only on the CIR components corresponding to each desk.
     We attach an ultra-low-power backscatter tag to each desk that reflects UWB signals modulated with a unique pseudo-noise (PN) sequence.
     By localizing these tags, we map each desk to specific ranges in the CIR.
-    When the layout changes, DeskPulse only re-localizes the tags (a quick, automated process) instead of re-collecting labeled occupancy data.
+    When the layout changes, DeskSense only re-localizes the tags (a quick, automated process) instead of re-collecting labeled occupancy data.
   </p>
 
   <p>
@@ -155,11 +155,11 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
   <br>
   <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
     <div style="text-align: center; width: 47.5%;">
-      <img src="./DeskPulse_files/PCB_block.drawio.png" style="width:100%;">
+      <img src="./DeskSense_files/PCB_block.drawio.png" style="width:100%;">
       <p style="text-align: center; margin-top: 5px;">Block diagram for the tag</p>
     </div>
     <div style="text-align: center; width: 47.5%;">
-      <img src="./DeskPulse_files/tag_annotated.jpg" style="width:100%;">
+      <img src="./DeskSense_files/tag_annotated.jpg" style="width:100%;">
       <p style="text-align: center;margin-top: 5px;">Fabricated tag</p>
     </div>
   </div>
@@ -170,17 +170,17 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
     The MCU stores a unique Kasami PN sequence and generates a control signal that drives the RF switch to toggle between short and open circuit states at the clock rate.
     These two states re-radiate the incoming UWB signal with a 180° phase difference, embedding the PN code in the backscattered reflection.
     When a UWB AP transmits, the tag modulates its reflection with this code, creating a distinct pattern in the received CIR.
-    By correlating specific CIR time bins with known PN sequences, DeskPulse identifies which part of the CIR corresponds to which tag, and therefore which desk. This enables automatic desk-to-CIR mapping at scale.
+    By correlating specific CIR time bins with known PN sequences, DeskSense identifies which part of the CIR corresponds to which tag, and therefore which desk. This enables automatic desk-to-CIR mapping at scale.
   </p>
 
 
   <h3>Challenge 3: Generalizable Occupancy Detection with Range-Gated Learning</h3>
   <br>
-  <img class="summary-img" src="./DeskPulse_files/deskpulse_model.png" style="width:100%;">
+  <img class="summary-img" src="./DeskSense_files/DeskSense_model.png" style="width:100%;">
   </br>
 
   <p> 
-    After localizing tags and mapping them to specific CIR ranges, DeskPulse performs <em>range-gating</em>: extracting only the CIR segments corresponding to each desk and feeding them to a convolutional neural network.
+    After localizing tags and mapping them to specific CIR ranges, DeskSense performs <em>range-gating</em>: extracting only the CIR segments corresponding to each desk and feeding them to a convolutional neural network.
     This geometry-aware approach focuses the model on desk-relevant reflections while filtering out unrelated environmental clutter, enabling generalization across different room and desk layouts without retraining.
   </p>
 
@@ -188,7 +188,7 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
     Following a similar design in [5], our occupancy detection pipeline begins with a <em>2D ResNet block</em> that extracts features across both spatial (CIR time bins) and temporal (consecutive frames) dimensions, capturing how reflections evolve as people move and occupy desks.
     An average pooling layer then aggregates spatial features, followed by a <em>1D ResNet block</em> that further refines temporal patterns.
     Finally, a pooling layer and fully connected layer output the binary occupancy status for each desk.
-    To improve robustness against "ghost occupancy" caused by multipath reflections from people in adjacent areas, DeskPulse uses multiple receiver nodes to increase observation diversity and reduce false positives.
+    To improve robustness against "ghost occupancy" caused by multipath reflections from people in adjacent areas, DeskSense uses multiple receiver nodes to increase observation diversity and reduce false positives.
   </p>
 
   <p>
@@ -201,14 +201,14 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
 </div>
 <div class="content">
   <h2>Results</h2>
-  <p> We evaluate DeskPulse on two key questions:</p>
+  <p> We evaluate DeskSense on two key questions:</p>
   <ul>
-    <li>How accurately can DeskPulse localize desks using backscatter tags?</li>
+    <li>How accurately can DeskSense localize desks using backscatter tags?</li>
     <li>How well does the occupancy model generalize to unseen desk layouts?</li>
   </ul>
   <h3>Experimental Setup</h3>
   <p>
-    We deploy DeskPulse in a common office environment with five desks, each equipped with a backscatter tag encoded with a unique 12-bit Kasami code (length 4095).
+    We deploy DeskSense in a common office environment with five desks, each equipped with a backscatter tag encoded with a unique 12-bit Kasami code (length 4095).
     Qorvo DWM3001CDK [9] UWB nodes serve as access points at fixed locations (Channel 9, 7.9 GHz center frequency, 500 MHz bandwidth).
     We heavily modified the firmware to extract raw CIR estimates at 1024 Hz, with each PN symbol lasting 2 CIR frames (512 Hz symbol rate).
     For tag localization, one node transmits while all other nodes receive and record CIR estimates.
@@ -218,11 +218,11 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
   <br>
   <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
     <div style="text-align: center; width: 35%;">
-      <img src="./DeskPulse_files/multi_node_setup.png" style="width:100%;">
+      <img src="./DeskSense_files/multi_node_setup.png" style="width:100%;">
       <p style="text-align: center; margin-top: 5px;">Tag Deployment Setup</p>
     </div>
     <div style="text-align: center; width: 60%;">
-      <img src="./DeskPulse_files/cir_data_rxtag01234_Node1_12it_24cir_ch9_xtalTX31_delay6_exp1_node1.npy_fivetag_normalized_pmr.png" style="width:100%;">
+      <img src="./DeskSense_files/cir_data_rxtag01234_Node1_12it_24cir_ch9_xtalTX31_delay6_exp1_node1.npy_fivetag_normalized_pmr.png" style="width:100%;">
       <p style="text-align: center;margin-top: 5px;">Correlation Results</p>
     </div>
   </div>
@@ -233,7 +233,7 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
     To extract the direct path, we apply a derivative-based peak selection algorithm: (1) normalize correlation power across CIR time bins to account for varying signal strengths at different tag distances, (2) compute the derivative of the normalized correlation to accurately identify peak locations, and (3) select the earliest peak exceeding a normalized amplitude threshold of 0.3 as the direct path measurement.
   </p>
   <p>
-    DeskPulse achieves <strong>localization errors below 10 cm</strong> across all five tags simultaneously.
+    DeskSense achieves <strong>localization errors below 10 cm</strong> across all five tags simultaneously.
     This precision is sufficient for reliable desk-to-CIR mapping, and the use of orthogonal Kasami codes enables interference-free multi-tag operation, demonstrating scalability to many-desk deployments.
   </p>
 
@@ -241,11 +241,11 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
   <br>
   <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
     <div style="text-align: center; width: 30%;">
-      <img src="./DeskPulse_files/node_deployment.png" style="width:100%;">
+      <img src="./DeskSense_files/node_deployment.png" style="width:100%;">
       <p style="text-align: center; margin-top: 5px;">UWB Node Deployment Setup Illustration</p>
     </div>
     <div style="text-align: center; width: 65%;">
-      <img src="./DeskPulse_files/desk_layout.png" style="width:100%;">
+      <img src="./DeskSense_files/desk_layout.png" style="width:100%;">
       <p style="text-align: center;margin-top: 5px;">Desk Layouts</p>
     </div>
   </div>
@@ -264,13 +264,13 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
 
   <p>
     We train the occupancy model on Layout 1 and test on the unseen Layout 2 to evaluate  generalization capability.
-    DeskPulse (with range-gating) is compared against a baseline that uses the full CIR without geometry-aware filtering.
+    DeskSense (with range-gating) is compared against a baseline that uses the full CIR without geometry-aware filtering.
     Both models are trained using the Adam optimizer for 100 epochs (learning rate 0.001, batch size 32).
   </p>
 
   <p>
-    <strong>Results:</strong> DeskPulse achieves <strong>79.17% test accuracy</strong> on the unseen layout, significantly outperforming the full-CIR baseline at <strong>66.67%</strong>.
-    Notably, the baseline overfits to Layout 1 (97.66% training accuracy vs. DeskPulse's 86.11%), while DeskPulse's range-gating and physics-aware augmentations prevent overfitting and enable better generalization.
+    <strong>Results:</strong> DeskSense achieves <strong>79.17% test accuracy</strong> on the unseen layout, significantly outperforming the full-CIR baseline at <strong>66.67%</strong>.
+    Notably, the baseline overfits to Layout 1 (97.66% training accuracy vs. DeskSense's 86.11%), while DeskSense's range-gating and physics-aware augmentations prevent overfitting and enable better generalization.
     This demonstrates that focusing on desk-specific CIR segments rather than entire-room fingerprints is helpful for cross-layout robustness without per-layout retraining.
   </p>
 
@@ -351,7 +351,7 @@ We evaluate DeskPulse on a 5-desk testbed across two rooms with different layout
 
   <h3>Future Work</h3>
   <p>
-    Several directions can extend DeskPulse's capabilities and practicality:
+    Several directions can extend DeskSense's capabilities and practicality:
   </p>
   <ul>
     <li>

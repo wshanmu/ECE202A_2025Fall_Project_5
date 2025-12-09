@@ -1,7 +1,7 @@
 # Weights & Biases configuration
 
 # W&B project and entity
-project: "deskpulse-full-range-estimation"
+project: "DeskSense-full-range-estimation"
 entity: null  # Your wandb username/team (null uses default)
 
 # Run organization

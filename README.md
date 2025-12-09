@@ -1,4 +1,4 @@
-# DeskPulse
+# DeskSense
 
 ## RTC Configure
 
@@ -70,7 +70,7 @@ python ./bistatic_collection/cir_control_remotes.py --fps 1024 --time 2 --delayT
 ```
 
 ```cmd
-/home/shanmu/miniconda3/envs/py10/bin/python /home/shanmu/Projects/DeskPulse/bistatic_collection/cir_control_remote_nodes_localizing.py --boards 0 1 --channel 9 --time 150 --suffix "cir24_exp0" --fps 1024 --cir_sample 24 --delayTX 6 --xtal_trim 25
+/home/shanmu/miniconda3/envs/py10/bin/python /home/shanmu/Projects/DeskSense/bistatic_collection/cir_control_remote_nodes_localizing.py --boards 0 1 --channel 9 --time 150 --suffix "cir24_exp0" --fps 1024 --cir_sample 24 --delayTX 6 --xtal_trim 25
 ```
 
 The `subprocess_data_collection.py` is a wrapper to run `cir_control_remote.py` multiple times. 

@@ -17,7 +17,7 @@ Input assumptions:
 - Features are already min-max normalized to [0, 1]
 - T and S are multiples of the downsampling factors (T divisible by 128, S divisible by 8)
 
-Author: Generated for DeskPulse project
+Author: Generated for DeskSense project
 """
 
 import torch
