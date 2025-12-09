@@ -51,7 +51,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
 
 <h3><em>What is Backscatter Communication?</em></h3> 
 <p>
-  Backscatter communication [7,8] allows a device to transmit information by modulating the reflection of an incident radio signal, rather than generating its own transmission. A backscatter tag uses a simple RF switch to toggle between reflective states (e.g., short vs. open circuit), creating a 180° phase shift in the reflected signal. This requires minimal power (no active radio transmitter), making it ideal for batteryless, maintenance-free deployment. In DeskSense, each tag modulates its reflection with a unique pseudo-noise code, enabling the system to identify and localize individual desks.
+  Backscatter communication [1,2] allows a device to transmit information by modulating the reflection of an incident radio signal, rather than generating its own transmission. A backscatter tag uses a simple RF switch to toggle between reflective states (e.g., short vs. open circuit), creating a 180° phase shift in the reflected signal. This requires minimal power (no active radio transmitter), making it ideal for batteryless, maintenance-free deployment. In DeskSense, each tag modulates its reflection with a unique pseudo-noise code, enabling the system to identify and localize individual desks.
 </p>
 
 <h3><em>What are Pseudo-Noise (PN) Codes?</em></h3> 
@@ -62,16 +62,28 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
 
 <div class="content">
 <h2>Related Work</h2>
+<h3>Deviced-Based Sensing</h3>
+<p>
+  To estimate occupancy states, one approach is to have occupants carry or wear mobile tags or devices [3]. However, this method can be inconvenient for occupants and may lead to inaccurate results if the device is misplaced [4]. 
+  A similar approach is to install sensors on desks, such as pressure sensors or infrared sensors, to directly monitor occupancy [5]. While these methods can provide accurate occupancy detection, they require significant infrastructure changes and maintenance, making them less practical for large-scale deployments in dynamic office environments.
+</p>
 
-<h3>UWB-Based Human Detection and Occupancy Sensing</h3>
+<h3>Device-Free Sensing</h3>
+<p>
+  A device-free approach does not require occupants to carry any devices, instead leveraging environmental sensing technologies such as cameras, Wi-Fi, UWB, or radar to infer occupancy based on changes in the environment. 
+  Camera-based systems can provide high accuracy but raise privacy concerns and may be affected by lighting conditions [6].
+  Wi-Fi-based sensing methods utilize existing Wi-Fi infrastructure to monitor signal variations caused by human presence, but they often struggle with limited spatial resolution and provide limited generalizability [3, 7, 8, 9].
+</p>
+
+<h4>UWB-Based Human Detection and Occupancy Sensing</h4>
   <p>
     Ultra-wideband (UWB) radio has been widely adopted for human detection and occupancy sensing due to its high temporal resolution, obstacle penetration capability, and privacy-preserving nature compared to camera-based systems.
-    Early work by Kim et al. [1] developed robust detection methods for determining the presence of individuals in indoor environments using IR-UWB radar, addressing challenges such as heavy clutter and multipath effects through systematic clutter reduction techniques including SVD-based approaches and two-stage detection schemes.
+    Early work by Kim et al. [10] developed robust detection methods for determining the presence of individuals in indoor environments using IR-UWB radar, addressing challenges such as heavy clutter and multipath effects through systematic clutter reduction techniques including SVD-based approaches and two-stage detection schemes.
     Their work demonstrated that combining range-domain and frequency-domain detection (for respiratory movement) could successfully identify both standing and lying individuals even in challenging environments.
   </p>
 
   <p>
-    More recently, Blangiardi et al. [2] explored AI-based people counting in public transport vehicles using multiple IR-UWB transceivers, showing that data fusion from multiple sensors combined with machine learning models could achieve up to 100% accuracy when trained on exhaustive datasets.
+    More recently, Blangiardi et al. [11] explored AI-based people counting in public transport vehicles using multiple IR-UWB transceivers, showing that data fusion from multiple sensors combined with machine learning models could achieve up to 100% accuracy when trained on exhaustive datasets.
     Their work highlighted the importance of training data diversity and demonstrated that models could generalize to unseen static configurations with up to 91.5% accuracy in simpler scenarios.
     However, both approaches rely on full-channel fingerprints that require extensive data collection for each new environment or layout configuration.
   </p>
@@ -79,7 +91,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
   <h3>Limitations of Fingerprinting-Based Approaches</h3>
   <p>
     While these UWB sensing systems demonstrate strong performance, they share a fundamental limitation: they learn from entire Channel Impulse Response (CIR) patterns that are highly specific to a particular room geometry and furniture arrangement.
-    Kim et al.'s [1] SVD-based clutter reduction assumes stationary background clutter captured in initial calibration measurements, while Blangiardi et al. [2] found that models trained on one positional configuration of people performed significantly worse (accuracy dropping from 91.5% to as low as 34.1%) when tested on different layouts.
+    Kim et al.'s [10] SVD-based clutter reduction assumes stationary background clutter captured in initial calibration measurements, while Blangiardi et al. [11] found that models trained on one positional configuration of people performed significantly worse (accuracy dropping from 91.5% to as low as 34.1%) when tested on different layouts.
     This fingerprinting dependency means that whenever desks, access points, or room layouts change, these systems require complete recalibration and retraining—a costly and unscalable process for dynamic workspace environments.
   </p>
 </div>
@@ -101,7 +113,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
   </br>
   <p>
     <em>CIR Upsampling:</em>
-    COTS UWB radios (e.g., Qorvo DW3000 [9]) provide CIR estimates with ~1 ns sampling intervals, corresponding to ~30 cm spatial resolution.
+    COTS UWB radios (e.g., Qorvo DW3000 [12]) provide CIR estimates with ~1 ns sampling intervals, corresponding to ~30 cm spatial resolution.
     Desk-level sensing requires finer resolution to distinguish nearby reflections, so we apply FFT-based upsampling through zero-padding in the frequency domain, increasing the temporal resolution for precise multipath separation.
   </p>
 
@@ -110,8 +122,8 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
     UWB radios construct CIR estimates by accumulating preamble symbols, so we first normalize amplitudes based on the reported accumulation count to ensure consistency across frames.
     For alignment, prior works rely on the first-path index reported by the radio's leading-edge detection algorithm, but this proves unreliable in practice.
     Instead, we exploit the fact that access points are typically ceiling- or wall-mounted, ensuring a stable line-of-sight (LoS) path between transmitter and receiver.
-    We perform cross-correlation on the LoS region to align each frame to a reference, similar to previous work [3], but we find that raw amplitude correlation can fail to align frames when peaks merge or amplitudes vary.
-    To improve robustness, we apply a second-stage alignment by correlating the second derivative of the amplitude profile, which is more sensitive to peak structure and successfully handles merged peaks [4].
+    We perform cross-correlation on the LoS region to align each frame to a reference, similar to previous work [13], but we find that raw amplitude correlation can fail to align frames when peaks merge or amplitudes vary.
+    To improve robustness, we apply a second-stage alignment by correlating the second derivative of the amplitude profile, which is more sensitive to peak structure and successfully handles merged peaks [14].
 
   </p>
   <br>
@@ -185,7 +197,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
   </p>
 
   <p>
-    Following a similar design in [5], our occupancy detection pipeline begins with a <em>2D ResNet block</em> that extracts features across both spatial (CIR time bins) and temporal (consecutive frames) dimensions, capturing how reflections evolve as people move and occupy desks.
+    Following a similar design in [15], our occupancy detection pipeline begins with a <em>2D ResNet block</em> that extracts features across both spatial (CIR time bins) and temporal (consecutive frames) dimensions, capturing how reflections evolve as people move and occupy desks.
     An average pooling layer then aggregates spatial features, followed by a <em>1D ResNet block</em> that further refines temporal patterns.
     Finally, a pooling layer and fully connected layer output the binary occupancy status for each desk.
     To improve robustness against "ghost occupancy" caused by multipath reflections from people in adjacent areas, DeskSense uses multiple receiver nodes to increase observation diversity and reduce false positives.
@@ -209,7 +221,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
   <h3>Experimental Setup</h3>
   <p>
     We deploy DeskSense in a common office environment with five desks, each equipped with a backscatter tag encoded with a unique 12-bit Kasami code (length 4095).
-    Qorvo DWM3001CDK [9] UWB nodes serve as access points at fixed locations (Channel 9, 7.9 GHz center frequency, 500 MHz bandwidth).
+    Qorvo DWM3001CDK [12] UWB nodes serve as access points at fixed locations (Channel 9, 7.9 GHz center frequency, 500 MHz bandwidth).
     We heavily modified the firmware to extract raw CIR estimates at 1024 Hz, with each PN symbol lasting 2 CIR frames (512 Hz symbol rate).
     For tag localization, one node transmits while all other nodes receive and record CIR estimates.
   </p>
@@ -308,7 +320,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
 
         <tbody>
             <tr>
-                <td class="text-left">Taoglas UWC.20 Antenna [10]</td>
+                <td class="text-left">Taoglas UWC.20 Antenna [16]</td>
                 <td class="text-right">3.89</td>
                 <td class="text-right">1.94</td>
                 <td colspan="3" class="text-center" style="font-style: italic;">
@@ -317,7 +329,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
             </tr>
             
             <tr>
-                <td class="text-left">SKY59608-711LF Switch [11]</td>
+                <td class="text-left">SKY59608-711LF Switch [17]</td>
                 <td class="text-right">0.68</td>
                 <td class="text-right">0.32</td>
                 <td class="text-right">15.00</td>
@@ -326,7 +338,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
             </tr>
             
             <tr>
-                <td class="text-left">RTC RV-3032-C7 Clock [12]</td>
+                <td class="text-left">RTC RV-3032-C7 Clock [18]</td>
                 <td class="text-right">3.18</td>
                 <td class="text-right">1.73</td>
                 <td class="text-right">0.16</td>
@@ -364,7 +376,7 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
     </li>
     <li>
       <strong>Radar-Based Exploration:</strong> 
-      Investigate the same geometry-aware approach using UWB radar kits (e.g., Qorvo Qm35825DK [13]), which may provide more stable CIR measurements and simplify hardware integration with existing building infrastructure.
+      Investigate the same geometry-aware approach using UWB radar kits (e.g., Qorvo Qm35825DK [19]), which may provide more stable CIR measurements and simplify hardware integration with existing building infrastructure.
     </li>
     <li>
       <strong>Advanced Learning Techniques:</strong> 
@@ -375,18 +387,25 @@ We evaluate DeskSense on a 5-desk testbed across two rooms with different layout
 
 <div class="content">
   <h2>Reference</h2>
-    [1] Robust Detection of Presence of Individuals in an Indoor Environment Using IR-UWB Radar <br>
-    [2] Exploring Data Fusion for AI-based People  Counting in a Static Public Transport Vehicle using  Multiple IR-UWB Transceivers <br>
-    [3] Respiro: Continuous Respiratory Rate Monitoring During Motion via Wearable Ultra-Wideband Radar <br>
-    [4] UTrack3D: 3D Tracking Using Ultra-wideband (UWB) Radios <br>
-    [5] UWB Radar-based Heart Rate Monitoring: A Transfer Learning Approach <br>
-    [7] Ultra-wide bandwidth backscatter modulation: processing schemes and performance <br>
-    [8] Passive UWB RFID for Tag Localization: Architectures and Design <br>
-    [9] Qorvo DWM3000 <a href="https://www.qorvo.com/products/p/DWM3000">https://www.qorvo.com/products/p/DWM3000</a> <br>
-    [10] Taoglas UWC.20 <a href="https://www.taoglas.com/product/uwc-20-3-5ghz-6-9ghz-ultra-wideband-uwb-smd-chip-antenna/">https://www.taoglas.com/product/uwc-20-3-5ghz-6-9ghz-ultra-wideband-uwb-smd-chip-antenna/</a> <br>
-    [11] SKY59608-711LF <a href="https://www.skyworksinc.com/en/Products/switches/SKY59608-711LF">https://www.skyworksinc.com/en/Products/switches/SKY59608-711LF</a> <br>
-    [12] RV-3032-C7 <a href="https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3032-c7">https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3032-c7</a> <br>
-    [13] Qorvo QM35825DK <a href="https://www.qorvo.com/products/p/QM35825DK-05">https://www.qorvo.com/products/p/QM35825DK-05</a> <br>
+    [1] Ultra-wide bandwidth backscatter modulation: processing schemes and performance <br>
+    [2] Passive UWB RFID for Tag Localization: Architectures and Design <br>
+    [3] Implementing Wi-Fi CSI-based room-level occupancy Estimation: an experimental study in multi-zone residential environments <br>
+    [4] A survey on device-free indoor localization and tracking in the multi-resident environment <br>
+    [5] Method for long-term mapping of occupancy patterns in open-plan and single office spaces by using passive-infrared (PIR) sensors mounted below desks <br>
+    [6] Deep vision-based occupancy counting: Experimental performance evaluation and implementation of ventilation control <br>
+    [7] WiFi-based non-contact human presence detection technology <br>
+    [8] Device-free occupancy detection and crowd counting in smart buildings with WiFi-enabled IoT <br>
+    [9] Wi-CaL: WiFi Sensing and Machine Learning Based Device-Free Crowd Counting and Localization <br>
+    [10] Robust Detection of Presence of Individuals in an Indoor Environment Using IR-UWB Radar <br>
+    [11] Exploring Data Fusion for AI-based People Counting in a Static Public Transport Vehicle using Multiple IR-UWB Transceivers <br>
+    [12] Qorvo DWM3000 <a href="https://www.qorvo.com/products/p/DWM3000">https://www.qorvo.com/products/p/DWM3000</a> <br>
+    [13] Respiro: Continuous Respiratory Rate Monitoring During Motion via Wearable Ultra-Wideband Radar <br>
+    [14] UTrack3D: 3D Tracking Using Ultra-wideband (UWB) Radios <br>
+    [15] UWB Radar-based Heart Rate Monitoring: A Transfer Learning Approach <br>
+    [16] Taoglas UWC.20 <a href="https://www.taoglas.com/product/uwc-20-3-5ghz-6-9ghz-ultra-wideband-uwb-smd-chip-antenna/">https://www.taoglas.com/product/uwc-20-3-5ghz-6-9ghz-ultra-wideband-uwb-smd-chip-antenna/</a> <br>
+    [17] SKY59608-711LF <a href="https://www.skyworksinc.com/en/Products/switches/SKY59608-711LF">https://www.skyworksinc.com/en/Products/switches/SKY59608-711LF</a> <br>
+    [18] RV-3032-C7 <a href="https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3032-c7">https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3032-c7</a> <br>
+    [19] Qorvo QM35825DK <a href="https://www.qorvo.com/products/p/QM35825DK-05">https://www.qorvo.com/products/p/QM35825DK-05</a> <br>
 </div>
 
 
